@@ -1,10 +1,8 @@
-package com.example.demo.model;
+package com.example.demo.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Publicacion {
@@ -16,6 +14,13 @@ public class Publicacion {
     private String contenido;
     private LocalDateTime fechaPublicacion;
 
+    @OneToMany(mappedBy = "publicacion", cascade = CascadeType.ALL)
+    private List<Comentario> comentarios;
+
+    @ManyToOne
+    @JoinColumn(name = "id_jugador", referencedColumnName = "id")
+    private Jugador jugador;
+
     public Publicacion() {}
 
     public Publicacion(String titulo, String contenido, LocalDateTime fechaPublicacion) {
@@ -23,6 +28,23 @@ public class Publicacion {
         this.contenido = contenido;
         this.fechaPublicacion = fechaPublicacion;
     }
+
+    public Publicacion(String titulo, String contenido, LocalDateTime fechaPublicacion, Jugador jugador) {
+        this.titulo = titulo;
+        this.contenido = contenido;
+        this.fechaPublicacion = fechaPublicacion;
+        this.jugador = jugador;
+    }
+
+
+    public Jugador getJugador() {
+        return jugador;
+    }
+
+    public void setJugador(Jugador jugador) {
+        this.jugador = jugador;
+    }
+
 
     public Long getId() {
         return id;
@@ -79,3 +101,4 @@ public class Publicacion {
                 '}';
     }
 }
+

@@ -1,44 +1,63 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Publicacion;
+import com.example.demo.dto.PublicacionDTO;
+import com.example.demo.domain.Publicacion;
 import com.example.demo.repository.PublicacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PublicacionService {
 
+    private final PublicacionRepository publicacionRepository;
+
     @Autowired
-    private PublicacionRepository publicacionRepository;
-
-    public List<Publicacion> getAllPublicaciones() {
-        return publicacionRepository.findAll();
+    public PublicacionService(PublicacionRepository publicacionRepository) {
+        this.publicacionRepository = publicacionRepository;
     }
 
-    public Publicacion getPublicacionById(Long id) {
-        Optional<Publicacion> publicacionOptional = publicacionRepository.findById(id);
-        if (publicacionOptional.isPresent()) {
-            return publicacionOptional.get();
-        }
-        return null;
+    @Transactional
+    public PublicacionDTO crearPublicacion(PublicacionDTO publicacionDTO) {
+        Publicacion publicacion = new Publicacion();
+
+        Publicacion nuevaPublicacion = publicacionRepository.save(publicacion);
+        return convertirAPublicacionDTO(nuevaPublicacion);
     }
 
-    public Publicacion createPublicacion(Publicacion publicacion) {
-        return publicacionRepository.save(publicacion);
+    @Transactional(readOnly = true)
+    public List<PublicacionDTO> obtenerTodasPublicaciones() {
+        return publicacionRepository.findAll().stream()
+                .map(this::convertirAPublicacionDTO)
+                .collect(Collectors.toList());
     }
 
-    public Publicacion updatePublicacion(Long id, Publicacion publicacion) {
-        if (publicacionRepository.existsById(id)) {
-            publicacion.setId(id);
-            return publicacionRepository.save(publicacion);
-        }
-        return null;
+    @Transactional(readOnly = true)
+    public PublicacionDTO obtenerPublicacionPorId(Long id) {
+        Publicacion publicacion = publicacionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Publicación no encontrada."));
+        return convertirAPublicacionDTO(publicacion);
     }
 
-    public void deletePublicacion(Long id) {
+    @Transactional
+    public PublicacionDTO actualizarPublicacion(Long id, PublicacionDTO publicacionDTO) {
+        Publicacion publicacion = publicacionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Publicación no encontrada."));
+
+        Publicacion publicacionActualizada = publicacionRepository.save(publicacion);
+        return convertirAPublicacionDTO(publicacionActualizada);
+    }
+
+    @Transactional
+    public void eliminarPublicacion(Long id) {
         publicacionRepository.deleteById(id);
+    }
+
+    private PublicacionDTO convertirAPublicacionDTO(Publicacion publicacion) {
+        PublicacionDTO publicacionDTO = new PublicacionDTO();
+        return publicacionDTO;
     }
 }

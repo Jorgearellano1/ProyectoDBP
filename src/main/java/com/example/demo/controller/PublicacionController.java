@@ -1,41 +1,52 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Publicacion;
+import com.example.demo.dto.PublicacionDTO;
 import com.example.demo.service.PublicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/publicaciones")
 public class PublicacionController {
 
+    private final PublicacionService publicacionService;
+
     @Autowired
-    private PublicacionService publicacionService;
-
-    @GetMapping
-    public List<Publicacion> getAllPublicaciones() {
-        return publicacionService.getAllPublicaciones();
-    }
-
-    @GetMapping("/{id}")
-    public Publicacion getPublicacionById(@PathVariable Long id) {
-        return publicacionService.getPublicacionById(id);
+    public PublicacionController(PublicacionService publicacionService) {
+        this.publicacionService = publicacionService;
     }
 
     @PostMapping
-    public Publicacion createPublicacion(@RequestBody Publicacion publicacion) {
-        return publicacionService.createPublicacion(publicacion);
+    public ResponseEntity<PublicacionDTO> crearPublicacion(@Valid @RequestBody PublicacionDTO publicacionDTO) {
+        PublicacionDTO nuevaPublicacion = publicacionService.crearPublicacion(publicacionDTO);
+        return ResponseEntity.ok(nuevaPublicacion);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PublicacionDTO>> obtenerTodasPublicaciones() {
+        List<PublicacionDTO> publicaciones = publicacionService.obtenerTodasPublicaciones();
+        return ResponseEntity.ok(publicaciones);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PublicacionDTO> obtenerPublicacionPorId(@PathVariable Long id) {
+        PublicacionDTO publicacion = publicacionService.obtenerPublicacionPorId(id);
+        return ResponseEntity.ok(publicacion);
     }
 
     @PutMapping("/{id}")
-    public Publicacion updatePublicacion(@PathVariable Long id, @RequestBody Publicacion publicacion) {
-        return publicacionService.updatePublicacion(id, publicacion);
+    public ResponseEntity<PublicacionDTO> actualizarPublicacion(@PathVariable Long id, @Valid @RequestBody PublicacionDTO publicacionDTO) {
+        PublicacionDTO publicacionActualizada = publicacionService.actualizarPublicacion(id, publicacionDTO);
+        return ResponseEntity.ok(publicacionActualizada);
     }
 
     @DeleteMapping("/{id}")
-    public void deletePublicacion(@PathVariable Long id) {
-        publicacionService.deletePublicacion(id);
+    public ResponseEntity<?> eliminarPublicacion(@PathVariable Long id) {
+        publicacionService.eliminarPublicacion(id);
+        return ResponseEntity.ok("Publicación eliminada con éxito");
     }
 }
