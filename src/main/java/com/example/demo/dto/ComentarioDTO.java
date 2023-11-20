@@ -4,7 +4,7 @@ public class ComentarioDTO {
 
     private Long id;
     private String contenido;
-    private Long autorId; // ID del usuario que hizo el comentario
+    private Long autorId;
 
 
     public ComentarioDTO() {
@@ -16,7 +16,6 @@ public class ComentarioDTO {
         this.autorId = autorId;
     }
 
-    // Getters y setters
 
     public Long getId() {
         return id;
